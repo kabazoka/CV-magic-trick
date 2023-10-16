@@ -30,35 +30,45 @@ def detect_hand_wave(frame):
                 return False
         else:
             return False
+        
 
-    
+def identify_card_rectangles(frame):
+    # Convert the frame to grayscale
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-def overlay_black_object(image, coin_location):    
-    x, y, radius = coin_location
-    radius = 50
-    overlay_color = (0, 0, 0)  # Black color
+    # Apply GaussianBlur to reduce noise and improve contour detection
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-    # Create a black rectangle to overlay over the coin
-    image_overlayed = image.copy()
-    
-    start_x = max(0, x - radius)
-    start_y = max(0, y - radius)
-    end_x = min(image.shape[1], x + radius)
-    end_y = min(image.shape[0], y + radius)
+    # Use Canny edge detection to detect edges
+    edges = cv2.Canny(blurred, 50, 150)
 
-    image_overlayed[start_y:end_y, start_x:end_x] = np.clip(image_overlayed[start_y:end_y, start_x:end_x] - overlay_color, 0, 255)
+    # Find contours in the edge-detected image
+    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    return image_overlayed
+    card_rectangles = []
+    for contour in contours:
+        # Approximate the contour to a polygon
+        epsilon = 0.02 * cv2.arcLength(contour, True)  # Adjust epsilon value as needed
+        approx = cv2.approxPolyDP(contour, epsilon, True)
+
+        # Check if the polygon has 4 vertices (a quadrilateral)
+        if len(approx) == 4:
+            # Check if the aspect ratio is close to a poker card's aspect ratio
+            x, y, w, h = cv2.boundingRect(approx)
+            aspect_ratio = float(w) / h
+            if 2.3 <= aspect_ratio <= 2.7:
+                card_rectangles.append(approx)
+
+    return card_rectangles
 
 
-
-def detect_coins(image, waved):
+def detect_coins(image, visible):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     gray_blurred = cv2.GaussianBlur(gray, (9, 9), 2)
     color = (0, 255, 0)
     thickness = 3
 
-    if waved == True:
+    if visible == False:
         color = (0, 0, 0)
         thickness = -1
     
@@ -89,24 +99,33 @@ def detect_coins(image, waved):
 # Initialize webcam
 cap = cv2.VideoCapture(0)
 waved = False
+visible = True
 
 while True:
+    hand_wave_detected = False
     ret, frame = cap.read()
     if not ret:
         break
 
-    # Detect coins in the current frame
-    coins_detected = detect_coins(frame, waved)
-
     # Detect hand wave
-    if waved == False:
-        hand_wave_detected = detect_hand_wave(frame)
+    hand_wave_detected = detect_hand_wave(frame)
 
-    if hand_wave_detected:        
-        waved = True    
+    if hand_wave_detected:
+        waved = not waved
+        visible = waved
+
+    # Detect coins in the current frame
+    coins_detected = detect_coins(frame, visible)
+
+    # Identify card-shaped rectangles in the current frame
+    card_rectangles = identify_card_rectangles(frame)
+
+    # Draw rectangles on the frame
+    for rect in card_rectangles:
+        cv2.drawContours(frame, [rect], -1, (0, 255, 0), 2)
 
     # Display the result
-    cv2.imshow('Coin Detection', coins_detected)
+    cv2.imshow('Coin/Card Detection', coins_detected)
 
     # Press 'q' to exit the loop and close the window
     if cv2.waitKey(1) & 0xFF == ord('q'):
