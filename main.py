@@ -3,6 +3,7 @@ import numpy as np
 import mediapipe as mp
 import time
 
+
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
