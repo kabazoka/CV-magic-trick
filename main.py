@@ -2,10 +2,56 @@ import cv2
 import numpy as np
 import mediapipe as mp
 import time
+from ultralytics import YOLO
+import cvzone
+import math
 
 
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
+
+model = YOLO("best.pt")
+classNames = ['10C', '10D', '10H', '10S',
+              '2C', '2D', '2H', '2S',
+              '3C', '3D', '3H', '3S',
+              '4C', '4D', '4H', '4S',
+              '5C', '5D', '5H', '5S',
+              '6C', '6D', '6H', '6S',
+              '7C', '7D', '7H', '7S',
+              '8C', '8D', '8H', '8S',
+              '9C', '9D', '9H', '9S',
+              'AC', 'AD', 'AH', 'AS',
+              'JC', 'JD', 'JH', 'JS',
+              'KC', 'KD', 'KH', 'KS',
+              'QC', 'QD', 'QH', 'QS']
+
+def poker_detection(img):
+    results = model(img, stream=True)
+    hand = []
+    colors = [(255, 0, 0), (0, 255, 0)]
+    pos = 0
+    for r in results:
+        boxes = r.boxes
+        for box in boxes:
+            # Bounding Box
+            x1, y1, x2, y2 = box.xyxy[0]
+            x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+            # cv2.rectangle(img,(x1,y1),(x2,y2),(255,0,255),3)
+            w, h = x2 - x1, y2 - y1
+            if x2 > 320 and y2 > 240:
+                pos = 1
+            cvzone.cornerRect(img, (x1, y1, w, h))
+            # Confidence
+            conf = math.ceil((box.conf[0] * 100)) / 100
+            # Class Name
+            cls = int(box.cls[0])
+
+            cvzone.putTextRect(img, f'{classNames[cls]} {conf}', (max(0, x1), max(35, y1)), scale=1, thickness=1, colorT=colors[pos])
+
+            if conf > 0.5:
+                hand.append(classNames[cls])
+    return img
+
 
 def detect_hand_wave(frame):
     # Initialize MediaPipe Hands
@@ -33,7 +79,7 @@ def detect_hand_wave(frame):
             return False
         
 
-def identify_card_rectangles(frame):
+#def identify_card_rectangles(frame):
     # Convert the frame to grayscale
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -94,15 +140,15 @@ def detect_coins(image, visible):
 
     return image
 
-# Load pre-trained model for coin classification
-# Replace this with your actual coin classification model and logic
-
 # Initialize webcam
 cap = cv2.VideoCapture(0)
+cap.set(3, 1280)
+cap.set(4, 720)
 waved = False
 visible = True
 
 while True:
+    # Hand wave detection
     hand_wave_detected = False
     ret, frame = cap.read()
     if not ret:
@@ -118,19 +164,17 @@ while True:
     # Detect coins in the current frame
     coins_detected = detect_coins(frame, visible)
 
-    # Identify card-shaped rectangles in the current frame
-    card_rectangles = identify_card_rectangles(frame)
-
-    # Draw rectangles on the frame
-    for rect in card_rectangles:
-        cv2.drawContours(frame, [rect], -1, (0, 255, 0), 2)
+    ### Poker Detection ###
+    poker_detected = poker_detection(frame)
 
     # Display the result
     cv2.imshow('Coin/Card Detection', coins_detected)
+    cv2.imshow('Coin/Card Detection', poker_detected)
 
     # Press 'q' to exit the loop and close the window
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
 
 cap.release()
 cv2.destroyAllWindows()
