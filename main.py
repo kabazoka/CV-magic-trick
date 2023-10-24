@@ -96,7 +96,7 @@ def detect_hand_wave(frame):
 #     for contour in contours:
 #         # Approximate the contour to a polygon
 #         epsilon = 0.02 * cv2.arcLength(contour, True)  # Adjust epsilon value as needed
-#         approx = cv2.approxPolyDP(contour, epsilon, True)
+#         approx = cv2.approxPolyD P(contour, epsilon, True)
 
 #         # Check if the polygon has 4 vertices (a quadrilateral)
 #         if len(approx) == 4:
