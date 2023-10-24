@@ -28,7 +28,7 @@ classNames = ['10C', '10D', '10H', '10S',
 def poker_detection(img):
     results = model(img, stream=True)
     hand = []
-    colors = [(255, 0, 0), (0, 255, 0)]
+    colors = [(255, 0, 0), (0, 255, 0)] #BGR
     pos = 0
     for r in results:
         boxes = r.boxes
@@ -79,34 +79,34 @@ def detect_hand_wave(frame):
             return False
         
 
-#def identify_card_rectangles(frame):
-    # Convert the frame to grayscale
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+# def identify_card_rectangles(frame):
+#     # Convert the frame to grayscale
+#     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Apply GaussianBlur to reduce noise and improve contour detection
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+#     # Apply GaussianBlur to reduce noise and improve contour detection
+#     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 
-    # Use Canny edge detection to detect edges
-    edges = cv2.Canny(blurred, 50, 150)
+#     # Use Canny edge detection to detect edges
+#     edges = cv2.Canny(blurred, 50, 150)
 
-    # Find contours in the edge-detected image
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+#     # Find contours in the edge-detected image
+#     contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    card_rectangles = []
-    for contour in contours:
-        # Approximate the contour to a polygon
-        epsilon = 0.02 * cv2.arcLength(contour, True)  # Adjust epsilon value as needed
-        approx = cv2.approxPolyDP(contour, epsilon, True)
+#     card_rectangles = []
+#     for contour in contours:
+#         # Approximate the contour to a polygon
+#         epsilon = 0.02 * cv2.arcLength(contour, True)  # Adjust epsilon value as needed
+#         approx = cv2.approxPolyDP(contour, epsilon, True)
 
-        # Check if the polygon has 4 vertices (a quadrilateral)
-        if len(approx) == 4:
-            # Check if the aspect ratio is close to a poker card's aspect ratio
-            x, y, w, h = cv2.boundingRect(approx)
-            aspect_ratio = float(w) / h
-            if 2.3 <= aspect_ratio <= 2.7:
-                card_rectangles.append(approx)
+#         # Check if the polygon has 4 vertices (a quadrilateral)
+#         if len(approx) == 4:
+#             # Check if the aspect ratio is close to a poker card's aspect ratio
+#             x, y, w, h = cv2.boundingRect(approx)
+#             aspect_ratio = float(w) / h
+#             if 2.3 <= aspect_ratio <= 2.7:
+#                 card_rectangles.append(approx)
 
-    return card_rectangles
+#     return card_rectangles
 
 
 def detect_coins(image, visible):
