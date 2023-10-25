@@ -1,11 +1,6 @@
 import cv2
 import numpy as np
-import mediapipe as mp
-import time
 from ultralytics import YOLO
-import cvzone
-import math
-
 
 def detect_coins(image, visible):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
