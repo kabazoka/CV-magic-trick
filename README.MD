@@ -10,4 +10,5 @@ Then run:
 ## Without pretrained weights
 
 ``!pip install ultralytics``
+
 ``!yolo task=detect mode=train model=yolov8n.pt data=<pokercard_dataset_path> epochs=50 imgsz=640``
