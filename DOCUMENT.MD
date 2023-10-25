@@ -25,3 +25,10 @@ The reason why I choose to apply Deep Learning on the project is on my previous 
 For the Poker Card Detection: The problem I am having is the detection of the card is not suitable for white cards. Because the original requirement of the assignment did not described enough so I didn’t realize we have to detect the white card and apply tranformation on it.
 
 For the DICE Detection: The model I trained is having troubles with real time detection.
+
+## Reference
+
+Poker dataset: https://universe.roboflow.com/roboflow-100/poker-cards-cxcvz
+Dice dataset: https://www.kaggle.com/datasets/nellbyler/d6-dice/code
+Code for poker: https://medium.com/@abhijeetas8660211/unveiling-the-cards-real-time-poker-card-detection-using-computer-vision-and-yolo-6e1c22e606ed
+Code for dice: https://www.kaggle.com/code/stpeteishii/dice-yolov8-train-and-predict
