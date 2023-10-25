@@ -1,8 +1,9 @@
 from ultralytics import YOLO
 import cvzone
 import math
+import cv2
 
-model = YOLO("C:/Users/kabaz_kwuenmy/Documents/GitHub/cv-magic-trick/weights/poker_best.pt")
+model = YOLO("weights/poker_best.pt")
 
 classNames = ['10C', '10D', '10H', '10S',
               '2C', '2D', '2H', '2S',
@@ -38,6 +39,16 @@ def poker_detection(img):
             conf = math.ceil((box.conf[0] * 100)) / 100
             # Class Name
             cls = int(box.cls[0])
+
+            # Load the image to be placed on the poker card
+            # card_img = cv2.imread(f"cards/{classNames[cls]}.png")
+            card_img = cv2.imread('card/card.png')
+
+            # Resize the image to fit the size of the poker card
+            card_img = cv2.resize(card_img, (w, h))
+
+            # Place the image on the poker card
+            img[y1:y2, x1:x2] = card_img
 
             cvzone.putTextRect(img, f'{classNames[cls]} {conf}', (max(0, x1), max(35, y1)), scale=1, thickness=1, colorT=colors[pos])
 

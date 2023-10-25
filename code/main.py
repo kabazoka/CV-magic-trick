@@ -4,6 +4,7 @@ from hand_wave_detect import detect_hand_wave
 from coin_detect import detect_coins
 from poker_detect import poker_detection
 from dice_detect import dice_detection
+from dice_detect import draw_box2
 
 # Initialize webcam
 cap = cv2.VideoCapture(0)
@@ -33,12 +34,14 @@ while True:
     poker_detected = poker_detection(frame)
 
     ### Dice Detection ###
-    dice_detected = dice_detection(frame)
+    # dice_detected = dice_detection(frame)
+    # dice_detected = draw_box2(frame)
+
 
     # Display the result
     cv2.imshow('Coin/Card Detection', coins_detected)
     cv2.imshow('Coin/Card Detection', poker_detected)
-    cv2.imshow('Coin/Card Detection', dice_detected)
+    # cv2.imshow('Coin/Card Detection', dice_detected)
 
     # Press 'q' to exit the loop and close the window
     if cv2.waitKey(1) & 0xFF == ord('q'):
